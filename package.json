@@ -1,0 +1,27 @@
+{
+  "name": "amonite-async",
+  "version": "1.0.0",
+  "description": "motor to build a webserver",
+  "main": "amonite.js",
+  "scripts": {
+    "test": "node unit/"
+  },
+  "keywords": [
+    "amonite",
+    "motor",
+    "web",
+    "webserver",
+    "page",
+    "component",
+    "lightweight",
+    "async"
+  ],
+  "author": "\"Karkael Haunter\" <karkael@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "bson-async": "github:karkael64/bson-async",
+    "event-target": "github:karkael64/event-target",
+    "http-arguments-async": "github:karkael64/http-arguments-async",
+    "http-code-async": "github:karkael64/http-code-async"
+  }
+}
