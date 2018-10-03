@@ -39,3 +39,5 @@ class Component extends Answerable {
         return `<component name="${name}" etag="${Answerable.bodyEtag(body)}">${body}</component>`;
     }
 }
+
+module.exports = Component;

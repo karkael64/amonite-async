@@ -100,14 +100,35 @@ class IncomingMessage {
     }
 }
 
-IncomingMessage.connection = {
+IncomingMessage.prototype.connection = {
     destroy: function () {
     }
 };
 
 class ServerResponse {
-    writeHead(code, title, headers) {}
-    end(body) {}
+    writeHead(code, title, headers) {
+        this.code = code;
+        this.title = title;
+        this.headers = headers
+    }
+
+    end(body) {
+        this.body = body;
+    }
+}
+
+function createServer(fn) {
+    return {
+        listen: function (options, callback) {
+            this.options = options;
+            if (callback) setTimeout(callback, 10);
+        },
+        testRequest: function (req) {
+            fn(req, new ServerResponse());
+        },
+        close: function () {
+        }
+    }
 }
 
 module.exports = {
@@ -118,6 +139,7 @@ module.exports = {
     'stub': stub,
     'IncomingMessage': IncomingMessage,
     'ServerResponse': ServerResponse,
+    'createServer': createServer,
     'count': function () {
         return count;
     }

@@ -4,7 +4,8 @@
   "description": "motor to build a webserver",
   "main": "amonite.js",
   "scripts": {
-    "test": "node unit/"
+    "test": "node unit/",
+    "start": "nodemon unit/start"
   },
   "keywords": [
     "amonite",

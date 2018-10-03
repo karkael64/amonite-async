@@ -18,8 +18,8 @@ function is_object(el) {
 
 /**
  * @alias Buffer.byteLength
- * @param body string|buffer
- * @returns {Number}
+ * @param body {string|buffer}
+ * @returns {number}
  */
 
 function body_length(body) {
@@ -28,13 +28,18 @@ function body_length(body) {
 
 class Amonite {
 
-    constructor(req, res) {
+    constructor(req, res, options) {
         this.configurations = [];
         this.controllers = [];
         this.ends = [];
 
         this.req = req;
         this.res = res;
+
+        if (is_object(options)) {
+            this.cache_duration = options.cacheDuration || Amonite.CACHE_DURATION;
+            this.use_cookies = options.useCookies || Amonite.USE_COOKIE;
+        }
     }
 
 
@@ -205,18 +210,18 @@ class Amonite {
             if (code === 200) {
 
                 let body = httpCode.message,
-                    url = this.req.url;
+                    url = this.req.url,
+                    cache = this.cache_duration;
 
                 httpCode.addHeader('Connection', 'keep-alive');
                 httpCode.addHeader('Content-Length', body_length(body).toString());
                 httpCode.addHeader('Content-Type', Answerable.getFilenameMime(url));
-                httpCode.addHeader('Cache-Control', 'public, max-age=120');
+                httpCode.addHeader('Cache-Control', 'public, max-age=' + Math.round(cache / 1000));
                 httpCode.addHeader('Date', ( new Date() ).toGMTString());
-                httpCode.addHeader('Expires', ( new Date(Date.now() + ( 120 * 1000 )) ).toGMTString());
+                httpCode.addHeader('Expires', ( new Date(Date.now() + ( cache )) ).toGMTString());
 
                 this.res.writeHead(code, title, httpCode.getHeaders());
                 this.res.end(body);
-                httpCode.body = body;
                 return this;
             }
             else if (code === 307 || code === 308) {
@@ -226,7 +231,6 @@ class Amonite {
 
                 this.res.writeHead(code, title, httpCode.getHeaders());
                 this.res.end(body);
-                httpCode.body = body;
                 return this;
             }
             else {
@@ -237,7 +241,6 @@ class Amonite {
 
                 this.res.writeHead(code, title, httpCode.getHeaders());
                 this.res.end(body);
-                httpCode.body = body;
                 return this;
             }
         }
@@ -255,16 +258,13 @@ class Amonite {
      */
 
     clone(req, res) {
-        if (req instanceof IncomingMessage && res instanceof ServerResponse) {
-            let a = new Amonite(req, res);
-            a.configurations = this.configurations.slice();
-            a.controllers = this.controllers.slice();
-            a.ends = this.ends.slice();
-            return a;
-        }
-        else {
-            throw new Error("Bad arguments");
-        }
+        let a = new Amonite(req, res);
+        a.configurations = this.configurations.slice();
+        a.controllers = this.controllers.slice();
+        a.ends = this.ends.slice();
+        a.cache_duration = this.cache_duration;
+        a.use_cookies = this.use_cookies;
+        return a;
     }
 
     execute(next) {
@@ -294,8 +294,12 @@ class Amonite {
      * @returns {Amonite}
      */
 
-    server() {
+    server(options) {
 
+        if (is_object(options)) {
+            if (options.cacheDuration !== undefined) this.cache_duration = options.cacheDuration;
+            if (options.useCookies !== undefined) this.use_cookies = options.useCookies;
+        }
         let self = this;
         let server = this.http = http.createServer(function (req, res) {
             self.clone(req, res).execute();
@@ -314,6 +318,9 @@ class Amonite {
     serverSecure(options) {
 
         if (is_object(options) && options.key && options.cert) {
+            if (options.cache_duration !== undefined) this.cache_duration = options.cache_duration;
+            if (options.use_cookies !== undefined) this.use_cookies = options.use_cookies;
+
             let https_options = {"key": options.key, "cert": options.cert};
             let self = this;
             let server = this.http = https.createServer(https_options, function (req, res) {
@@ -346,5 +353,8 @@ class Amonite {
 
 Amonite.Document = require('./document');
 Amonite.Component = require('./component');
+
+Amonite.CACHE_DURATION = 120000;
+Amonite.USE_COOKIE = true;
 
 module.exports = Amonite;

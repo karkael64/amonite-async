@@ -11,6 +11,33 @@ class AmoniteBuilder extends Amonite {
     constructor(req, res) {
         super(req, res);
         this.folder = __dirname;
+
+        this.addConfiguration(async function (req) {
+            req.file = req.url.replace(/[?#].*$/, '').replace(/\/$/, '/index.html');
+            req.arguments = new Arguments();
+            await req.arguments.set(req);
+        });
+
+        this.addController(async function (req) {
+            let file = File.build(this.folder + req.file);
+            if (await file.exists() && !file.path.match(/\.sjs$/)) {
+                return await file.read();
+            }
+        });
+
+        this.addController(async function (req) {
+            let file = File.build(this.folder + req.file);
+            if (await file.exists() && file.path.match(/\.sjs$/)) {
+                return require(file.path);
+            }
+        });
+
+        this.addController(async function (req) {
+            let file = File.build(this.folder + req.file + '.sjs');
+            if (await file.exists()) {
+                return require(file.path);
+            }
+        });
     }
 
     server() {
@@ -22,35 +49,19 @@ class AmoniteBuilder extends Amonite {
         this.folder = is_object(options) && options.folder || this.folder;
         return super.serverSecure.apply(this, arguments);
     }
+
+    clone(req, res) {
+        let a = new AmoniteBuilder(req, res);
+        a.configurations = this.configurations.slice();
+        a.controllers = this.controllers.slice();
+        a.ends = this.ends.slice();
+        a.cache_duration = this.cache_duration;
+        a.use_cookies = this.use_cookies;
+        a.folder = this.folder;
+        return a;
+    }
 }
 
-const amo = new AmoniteBuilder(null, null);
+AmoniteBuilder.Amonite = Amonite;
 
-amo.addConfiguration(async function (req) {
-    req.file = req.url.replace(/[?#].*$/, '').replace(/\/$/, '/index.html');
-    req.arguments = new Arguments();
-    await req.arguments.set(req);
-});
-
-amo.addController(async function (req) {
-    let file = File.build(amo.folder + req.file);
-    if (await file.exists() && !file.path.match(/\.sjs$/)) {
-        return await file.read();
-    }
-});
-
-amo.addController(async function (req) {
-    let file = File.build(amo.folder + req.file);
-    if (await file.exists() && file.path.match(/\.sjs$/)) {
-        return require(file.path);
-    }
-});
-
-amo.addController(async function (req) {
-    let file = File.build(amo.folder + req.file + '.sjs');
-    if (await file.exists()) {
-        return require(file.path);
-    }
-});
-
-module.exports = amo;
+module.exports = AmoniteBuilder;
