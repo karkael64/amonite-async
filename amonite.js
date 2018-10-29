@@ -4,9 +4,7 @@ const HttpCode = require('http-code-async'),
 
     http = require('http'),
     https = require('https'),
-    zlib = require('zlib'),
-    IncomingMessage = http.IncomingMessage,
-    ServerResponse = http.ServerResponse;
+    zlib = require('zlib');
 
 function is_function(el) {
     return (typeof el === 'function');
@@ -211,7 +209,8 @@ class Amonite {
 
                 let body = httpCode.message,
                     url = this.req.url,
-                    cache = this.cache_duration;
+                    cache = this.cache_duration,
+                    etag = JSON.stringify(Answerable.bodyEtag(body));
 
                 httpCode.addHeader('Connection', 'keep-alive');
                 httpCode.addHeader('Content-Length', body_length(body).toString());
@@ -219,6 +218,7 @@ class Amonite {
                 httpCode.addHeader('Cache-Control', 'public, max-age=' + Math.round(cache / 1000));
                 httpCode.addHeader('Date', ( new Date() ).toGMTString());
                 httpCode.addHeader('Expires', ( new Date(Date.now() + ( cache )) ).toGMTString());
+                httpCode.addHeader('ETag', etag);
 
                 this.res.writeHead(code, title, httpCode.getHeaders());
                 this.res.end(body);
@@ -252,8 +252,8 @@ class Amonite {
     /**
      * @method <clone> clone the selected Amonite instance, duplicate its configurators and its ccontrollers, with new
      *      request & response objects set in parameters.
-     * @param req {IncomingMessage}
-     * @param res {ServerResponse}
+     * @param req {http.IncomingMessage}
+     * @param res {http.ServerResponse}
      * @returns {Amonite}
      */
 

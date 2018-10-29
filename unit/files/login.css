@@ -1,8 +1,10 @@
 html,
 body,
-.model {
+modal {
     position: absolute;
     display: block;
+    box-sizing: border-box;
+    overflow: auto;
 
     top: 0;
     left: 0;
@@ -16,6 +18,10 @@ body,
     padding: 0;
 }
 
+component {
+    display: block;
+}
+
 edit-table {
     display: table;
 }
@@ -27,4 +33,392 @@ edit-table-row {
 edit-table-cell {
     display: table-cell;
     padding: 4px 12px;
+}
+
+checkbox {
+    display: block;
+    cursor: pointer;
+    padding: .15em;
+}
+
+checkbox > * {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+checkbox checkbox-box {
+    user-select: none;
+    box-sizing: border-box;
+    border: 1px solid #aaa;
+    font-size: 1.6em;
+
+    width: .75em;
+    height: .75em;
+    margin-right: .25em;
+    line-height: 1.1em;
+
+    font-weight: bold;
+    overflow: visible;
+    color: transparent;
+
+    background: white;
+    box-shadow: inset 0 0 .2em #aaa;
+}
+
+checkbox:focus{
+    outline: none;
+}
+
+checkbox:focus checkbox-box {
+    box-shadow: 0 0 3px #88f;
+    outline: 1px solid #88f;
+}
+
+checkbox[value=true] checkbox-box {
+    color: green;
+}
+
+checkbox checkbox-text {
+    width: calc(100% - 1.6em);
+}
+
+checkbox-list {
+    display: block;
+}
+
+checkbox-listname {
+    display: block;
+    font-weight: bold;
+    cursor: default;
+    padding: .15em;
+}
+
+dropdown checkbox-list > checkbox-list {
+    margin-left: 1em;
+}
+
+autocomplete,
+dropdown {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    user-select: none;
+    box-sizing: border-box;
+    vertical-align: top;
+}
+
+dropdown.top checkbox-list{
+    bottom: 100%;
+}
+
+autocomplete.focus autocomplete-box,
+dropdown:focus {
+    box-shadow: 0 0 3px #88f;
+    outline: 1px solid #88f;
+}
+
+autocomplete input:focus {
+    outline: none;
+}
+
+dropdown dropdown-box {
+    display: block;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    width: 10em;
+    height: 1.2em;
+    padding: 4px 8px;
+    background: #eee;
+}
+
+dropdown dropdown-box dropdown-input,
+dropdown dropdown-box:after {
+    display: inline-block;
+    height: 1.2em;
+    vertical-align: middle;
+}
+
+dropdown dropdown-box dropdown-input {
+    width: calc(100% - 1.2em);
+    font-size: 1em;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+dropdown dropdown-box:after {
+    content: '🢒';
+    width: 1.3em;
+    text-align: center;
+    transition: transform .2s ease;
+    transform: rotate(90deg);
+    font-size: .9em;
+    font-weight: bold;
+}
+
+dropdown > checkbox-list {
+    position: absolute;
+    z-index: 9;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 0;
+    border: none;
+    background: #fff;
+}
+
+dropdown > * {
+    display: none;
+}
+
+dropdown.show > checkbox-list {
+    display: block;
+    max-height: 40vh;
+    animation: fadein .3s;
+    border: 1px solid #ccc;
+}
+
+dropdown.hide > checkbox-list {
+    display: block;
+    animation: fadeout .1s;
+}
+
+
+dropdown checkbox-list checkbox:nth-child(even) {
+    background: rgba(127, 127, 127, .04);
+}
+
+dropdown checkbox-list checkbox:nth-child(odd) {
+    background: rgba(127, 127, 127, .08);
+}
+
+dropdown[count="unique"] checkbox:focus,
+dropdown checkbox-list checkbox:hover {
+    background: #bbf;
+}
+
+
+dropdown.show dropdown-box:after {
+    transform: rotate(-90deg);
+}
+
+dropdown checkbox-list[count="unique"] checkbox-box {
+    display: none;
+}
+
+dropdown checkbox-list[count="unique"] checkbox-text {
+    width: 100%;
+}
+
+
+@keyframes fadein {
+    from {
+        max-height: 0;
+        border: none;
+    }
+
+    1% {
+        border: 1px solid #ccc;
+    }
+
+    to {
+        max-height: 40vh;
+        border: 1px solid #ccc;
+    }
+}
+
+@keyframes fadeout {
+    from {
+        max-height: 40vh;
+        border: 1px solid #ccc;
+    }
+
+    99% {
+        border: 1px solid #ccc;
+    }
+
+    to {
+        max-height: 0;
+        border: none;
+    }
+}
+
+
+autocomplete autocomplete-box {
+    display: block;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    width: 10em;
+    height: 1.2em;
+    padding: 4px 8px;
+    background: #eee;
+}
+
+autocomplete autocomplete-box input,
+autocomplete autocomplete-box:after {
+    display: inline-block;
+    height: 1.2em;
+    line-height: 1.2em;
+    vertical-align: middle;
+}
+
+autocomplete autocomplete-box input {
+    width: calc(100% - 1.2em);
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    white-space: nowrap;
+    overflow: hidden;
+    font: inherit;
+}
+
+autocomplete autocomplete-box:after {
+    content: '🔎';
+    width: 1.3em;
+    text-align: center;
+    transition: transform .2s ease;
+    font-size: .9em;
+}
+
+autocomplete.focus autocomplete-box:after {
+    transform: rotate(-90deg);
+}
+
+
+autocomplete item {
+    display: block;
+}
+
+autocomplete.focus > autocomplete-list {
+    display: block;
+    max-height: 40vh;
+    animation: fadein .3s;
+    border: 1px solid #ccc;
+}
+
+autocomplete.blur > autocomplete-list {
+    display: block;
+    animation: fadeout .1s;
+}
+
+
+autocomplete > autocomplete-list {
+    position: absolute;
+    z-index: 9;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 0;
+    border: none;
+    background: #fff;
+}
+
+autocomplete autocomplete-list item {
+    display: block;
+    cursor: pointer;
+    padding: .15em;
+}
+
+autocomplete autocomplete-list item:nth-child(even) {
+    background: rgba(127, 127, 127, .04);
+}
+
+autocomplete autocomplete-list item:nth-child(odd) {
+    background: rgba(127, 127, 127, .08);
+}
+
+autocomplete autocomplete-list item:focus,
+autocomplete autocomplete-list item:hover {
+    background: #bbf;
+}
+
+autocomplete autocomplete-list item not-found {
+    opacity: .4;
+}
+
+autocomplete autocomplete-list item found {
+    opacity: 1;
+}
+
+
+hour-digital {
+    display: inline-block;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    width: 10em;
+    height: 1.2em;
+    padding: 4px 8px;
+    background: #eee;
+}
+
+hour-digital > input,
+hour-digital > icon{
+    vertical-align: middle;
+    display: inline-block;
+}
+
+hour-digital input {
+    width: calc(50% - 1.2em);
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    white-space: nowrap;
+    overflow: hidden;
+    font: inherit;
+    text-align: center;
+}
+
+hour-digital icon {
+    width: 1.2em;
+    height: 1.2em;
+    padding: 0;
+    border: none;
+    background: transparent;
+    white-space: nowrap;
+    overflow: hidden;
+    font: inherit;
+    text-align: center;
+}
+
+hour-digital icon.hours:after {
+    content: 'h';
+    line-height: 1.2em;
+}
+
+hour-digital icon.minutes:after {
+    content: '🕙';
+    font-size: .9em;
+}
+
+month > days-name > span,
+day {
+    display: inline-block;
+    width: 1.4em;
+    text-align: right;
+}
+
+year,
+month,
+week {
+    display: block;
+}
+
+month > days-name {
+    border-bottom: 1px solid #ccc;
+}
+
+month-wrapper {
+    display: inline-block;
+    vertical-align: top;
+    margin: .5em;
+}
+
+month-wrapper month-name {
+    display: block;
+    text-align: center;
+    font-weight: bold;
+}
+
+day.public-holiday {
+    background: #ddd;
+    color: #333;
 }

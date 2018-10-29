@@ -29,8 +29,13 @@ class Component extends Answerable {
 
     async getContent(req, res) {
         let name = this.constructor.name;
-        if (req.arguments.get('component') === name && is_function(this.onCall)) {
-            await this.onCall(req, res);
+        if (req.arguments.get('component') === name) {
+            if (is_function(this.onCall)) {
+                await this.onCall(req, res);
+            }
+            else {
+                throw new HttpCode(200, await this.getHTML(req, res));
+            }
         }
         let body = await this.getHTML(req, res);
         if (!is_string(body)) {

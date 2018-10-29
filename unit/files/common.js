@@ -10,7 +10,7 @@
     // complete prototypes
 
     /**
-     * @function remove a single item in an array, without changing or cloning it.
+     * @method remove a single item in an array (starting search at the top of pile), without changing or cloning it.
      * @param item {*}
      * @returns {*}
      */
@@ -22,12 +22,16 @@
     }
 
     if (!Array.prototype.hasOwnProperty('remove')) {
-        Object.defineProperty(Array.prototype, 'remove', {"enumerable": false, "configurable": false, "value": remove});
+        Object.defineProperty(Array.prototype, 'remove', {
+            "enumerable": false,
+            "configurable": false,
+            "value": remove
+        });
     }
 
 
     /**
-     * @function insert a single item at an array position, or at the end if position is bigger than array length
+     * @method insert a single item at an array position, or at the end if position is bigger than array length
      * @param item
      * @param position
      */
@@ -45,12 +49,16 @@
     }
 
     if (!Array.prototype.hasOwnProperty('insert')) {
-        Object.defineProperty(Array.prototype, 'insert', {"enumerable": false, "configurable": false, "value": insert});
+        Object.defineProperty(Array.prototype, 'insert', {
+            "enumerable": false,
+            "configurable": false,
+            "value": insert
+        });
     }
 
 
     /**
-     * @function returns this string cloned and encoded utf-8 to ASCII
+     * @method returns this string cloned and encoded utf-8 to ASCII
      * @returns {string}
      */
 
@@ -85,7 +93,7 @@
 
 
     /**
-     * @function returns this string cloned and decoded ASCII to utf-8
+     * @method returns this string cloned and decoded ASCII to utf-8
      * @returns {string}
      */
 
@@ -130,7 +138,11 @@
      */
 
     if (!Number.hasOwnProperty('isNaN')) {
-        Object.defineProperty(Number, 'isNaN', {"enumerable": false, "configurable": false, "value": isNaN});
+        Object.defineProperty(Number, 'isNaN', {
+            "enumerable": false,
+            "configurable": false,
+            "value": isNaN
+        });
     }
 
 
@@ -150,14 +162,18 @@
         prototype.constructor = constructor;
         for (var i in prototype)
             if (prototype.hasOwnProperty(i) && !( prototype[i] instanceof Object && (prototype[i].value || prototype[i].get || prototype[i].set) ))
-                prototype[i] = {"enumerable": false, "configurable": false, "value": prototype[i]};
+                prototype[i] = {"enumerable": false, "configurable": true, "value": prototype[i]};
 
         constructor.prototype = Object.create(parent && parent.prototype || null, prototype);
         return constructor;
     }
 
     if (!Object.hasOwnProperty('extend')) {
-        Object.defineProperty(Object, 'extend', {"enumerable": false, "configurable": false, "value": extend});
+        Object.defineProperty(Object, 'extend', {
+            "enumerable": false,
+            "configurable": false,
+            "value": extend
+        });
     }
 
     /**
@@ -172,13 +188,17 @@
         if (!( prototype instanceof Object )) prototype = {};
         for (var i in prototype)
             if (prototype.hasOwnProperty(i))
-                prototype[i] = {"enumerable": false, "configurable": false, "value": prototype[i]};
+                prototype[i] = {"enumerable": false, "configurable": true, "value": prototype[i]};
 
         return Object.create(null, prototype);
     }
 
     if (!Object.hasOwnProperty('extendNull')) {
-        Object.defineProperty(Object, 'extendNull', {"enumerable": false, "configurable": false, "value": extendNull});
+        Object.defineProperty(Object, 'extendNull', {
+            "enumerable": false,
+            "configurable": false,
+            "value": extendNull
+        });
     }
 
     // should be defined as if
@@ -188,6 +208,144 @@
     }
 
     Object.defineProperty(Object.prototype, "toString", {"enumerable": false, "value": toString});
+
+    /**
+     * @function <isClass> is used to verify a class or a function
+     * @param el {*}
+     * @returns {boolean}
+     */
+
+    function isClass(el) {
+        return el.toString().indexOf('class') === 0;
+    }
+
+    Object.defineProperty(Function, "isClass", {
+        "enumerable": true,
+        "writable": false,
+        "value": isClass
+    });
+
+    /**
+     * @function <assign> is used to complete an object with others.
+     */
+
+    if (typeof Object.assign !== 'function') {
+        // Must be writable: true, enumerable: false, configurable: true
+        Object.defineProperty(Object, "assign", {
+            value: function assign(target, varArgs) { // .length of function is 2
+                'use strict';
+                if (target == null) { // TypeError if undefined or null
+                    throw new TypeError('Cannot convert undefined or null to object');
+                }
+
+                var to = Object(target);
+
+                for (var index = 1; index < arguments.length; index++) {
+                    var nextSource = arguments[index];
+
+                    if (nextSource != null) { // Skip over if undefined or null
+                        for (var nextKey in nextSource) {
+                            // Avoid bugs when hasOwnProperty is shadowed
+                            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                                to[nextKey] = nextSource[nextKey];
+                            }
+                        }
+                    }
+                }
+                return to;
+            },
+            writable: true,
+            configurable: true
+        });
+    }
+
+    function turn(int, mod) {
+        if (int < 0)
+            return (mod + int % mod) % mod;
+        else
+            return int % mod;
+    }
+
+    if(!Math.hasOwnProperty('turn')) {
+        Object.defineProperty(Math, 'turn', {
+            'enumerable': false,
+            'configurable': true,
+            'value': turn
+        });
+    }
+
+    (function dateConstants(){
+        var obj = {};
+
+        obj.SUNDAY = 0;
+        obj.MONDAY = 1;
+        obj.TUESDAY = 2;
+        obj.WEDNESDAY = 3;
+        obj.THURSDAY = 4;
+        obj.FRIDAY = 5;
+        obj.SATURDAY = 6;
+
+        obj.MILLISECOND_DURATION = 1;
+        obj.SECOND_DURATION = obj.MILLISECOND_DURATION * 1000;
+        obj.MINUTE_DURATION = obj.SECOND_DURATION * 60;
+        obj.HOUR_DURATION = obj.MINUTE_DURATION * 60;
+        obj.DAY_DURATION = obj.HOUR_DURATION * 24;
+        obj.WEEK_DURATION = obj.DAY_DURATION * 7;
+
+        obj.DAYS_NAME = "Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday".split(',');
+        obj.MONTHS_NAME = "January,February,March,April,May,June,July,August,September,October,November,December".split(',');
+
+        for(var key in obj){
+            if(obj.hasOwnProperty(key)) {
+                Object.defineProperty(Date, key, {
+                    'enumerable': false,
+                    'configurable': false,
+                    'value': obj[key]
+                });
+            }
+        }
+        Date.FIRST_WEEK_DAY = Date.MONDAY;
+
+    })();
+
+    if (!Date.prototype.hasOwnProperty('getISODay')) {
+        Object.defineProperty(Date.prototype, 'getISODay', {
+            enumerable: false,
+            configurable: true,
+            value: function getISODay() {
+                return Math.turn(this.getDay() - Date.FIRST_WEEK_DAY - 1, 7)
+            }
+        });
+    }
+
+    if (!Date.prototype.hasOwnProperty('getYearFirstWeekDay')) {
+        Object.defineProperty(Date.prototype, 'getYearFirstWeekDay', {
+            'enumerable': false,
+            'configurable': true,
+            'value': function getYearFirstWeekDay() {
+                var dt = new Date(this.getFullYear(), 0, 1, 0, 0, 0, 0);
+                if (dt.getISODay() > 2) {
+                    dt.setDate(7 - dt.getISODay());
+                }
+                else {
+                    dt.setDate(-dt.getISODay());
+                }
+                return dt;
+            }
+        });
+    }
+
+    if (!Date.prototype.hasOwnProperty('getWeek')) {
+        Object.defineProperty(Date.prototype, 'getWeek', {
+            'enumerable': false,
+            'configurable': true,
+            'value': function getWeek() {
+                var dt = new Date(this.getFullYear(), this.getMonth(), this.getDate(), 1, 0, 0, 0);
+                var yearFirstWeekDay = this.getYearFirstWeekDay();
+                return Math.floor(( dt.valueOf() - yearFirstWeekDay.valueOf() ) / Date.WEEK_DURATION);
+            }
+        });
+    }
 
 })();
 
@@ -200,7 +358,7 @@ this.window && (function () {
 
 
     /**
-     * @function selectedOptions is a polyfill of an HTMLSelectElement which returns its options selected
+     * @method selectedOptions is a polyfill of an HTMLSelectElement which returns its options selected
      * @returns {Array}
      */
 
@@ -222,7 +380,7 @@ this.window && (function () {
 
 
     /**
-     * @function remove is a polyfill for removing itself node from its parent
+     * @method remove is a polyfill for removing itself node from its parent
      * @returns {Element|CharacterData|DocumentType}
      * @compatibility
      */
@@ -247,7 +405,41 @@ this.window && (function () {
 
 
     /**
-     * @function formToJSON is used to translate an HTMLFormElement to a JSON object
+     * @method <attachShadow> attaches a shadow DOM tree to the specified element and returns a reference to its
+     *      ShadowRoot.
+     * @returns {*}
+     * @warn just temporary before Shadow implementation.
+     */
+
+
+    function attachShadow() {
+
+        if (attachShadow.old) {
+            try {
+                return attachShadow.old({mode: 'open'});
+            }
+            catch (err) {
+            }
+        }
+        var f = new DocumentFragment();
+        Object.defineProperty(this, 'shadowRoot', {
+            "enumerable": true,
+            "configurable": true,
+            "value": f
+        });
+        return f;
+    }
+
+    attachShadow.old = Element.prototype.attachShadow;
+    Object.defineProperty(Element.prototype, 'attachShadow', {
+        "enumerable": false,
+        "configurable": true,
+        "value": attachShadow
+    });
+
+
+    /**
+     * @method formToJSON is used to translate an HTMLFormElement to a JSON object
      * @returns {{name: *, data: {}}}
      */
 
@@ -361,10 +553,18 @@ this.window && (function () {
                 throw new Error('An instance of ' + name + ' already has id \'' + id + '\'.');
             if (ids[name] < id)
                 ids[name] = id + 1;
-            Object.defineProperty(this, '__id__', {'enumerable': false, 'configurable': false, 'value': id});
+            Object.defineProperty(this, '__id__', {
+                'enumerable': false,
+                'configurable': false,
+                'value': id
+            });
         }
         else {
-            Object.defineProperty(this, '__id__', {'enumerable': false, 'writable': true, 'value': null});
+            Object.defineProperty(this, '__id__', {
+                'enumerable': false,
+                'writable': true,
+                'value': null
+            });
         }
         all[name].push(this);
     }
@@ -389,7 +589,11 @@ this.window && (function () {
         if (ids[name] < id)
             ids[name] = id + 1;
 
-        Object.defineProperty(this, '__id__', {'enumerable': false, 'configurable': false, 'value': id});
+        Object.defineProperty(this, '__id__', {
+            'enumerable': false,
+            'configurable': false,
+            'value': id
+        });
     }
 
     Object.extend(Uniq, null, {
@@ -422,7 +626,6 @@ this.window && (function () {
  *        Node.getParent(String)                // select first parent match node type
  *        Node.isChildOf(Node)
  *        Node.isParentOf(Node)
- *        window.$.define                       // define a component at first insertion in dom
  */
 
 this.window && (function (context) {
@@ -461,18 +664,6 @@ this.window && (function (context) {
         });
     }
 
-    var listened = [];
-
-    function once(prop, fn_auto, parent) {
-        auto(prop, function (ev, $el) {
-            if (listened.indexOf($el) === -1) {
-                listened.push($el);
-                fn_auto($el);
-                $el.dispatch('define');
-            }
-        }, parent || context);
-    }
-
     //  SELECTORS
     context.$ = function $(prop, fn_auto) {
         if (prop instanceof Function)
@@ -491,22 +682,24 @@ this.window && (function (context) {
         return null;
     };
 
-    Element.prototype.$ = function $(prop, fn_auto) {
-        if (arguments.length === 1)
-            return this.querySelector(prop);
-        if (arguments.length === 2)
-            return auto(prop, fn_auto, this);
-        return null;
-    };
-    Element.prototype.$$ = function $$(prop, fn_auto) {
-        if (arguments.length === 1)
-            return this.querySelectorAll(prop);
-        if (arguments.length === 2)
-            return auto(prop, fn_auto, this);
-        return null;
-    };
+    ([Element.prototype, DocumentFragment.prototype, HTMLDocument.prototype]).forEach(function (proto) {
 
-    context.$.define = once;
+        proto.$ = function $(prop, fn_auto) {
+            if (arguments.length === 1)
+                return this.querySelector(prop);
+            if (arguments.length === 2)
+                return auto(prop, fn_auto, this);
+            return null;
+        };
+        proto.$$ = function $$(prop, fn_auto) {
+            if (arguments.length === 1)
+                return this.querySelectorAll(prop);
+            if (arguments.length === 2)
+                return auto(prop, fn_auto, this);
+            return null;
+        };
+
+    });
 
     Node.prototype.prependChild = function prependChild($el) {
         if (this.firstChild) {
@@ -563,7 +756,7 @@ this.window && (function (context) {
     var SVGNS = "http://www.w3.org/2000/svg";
 
     /**
-     * @function setStyles set the style <style> to value <value> of this instance of Element in DOM,
+     * @method setStyles set the style <style> to value <value> of this instance of Element in DOM,
      *      or return <style> value if <value> is not used,
      *      or remove <style> if <value> is null or undefined
      * @param style string|{Object}
@@ -609,7 +802,7 @@ this.window && (function (context) {
 
 
     /**
-     * @function setAttributes set the attribute <attr> to value <value> of this instance of Element in DOM,
+     * @method setAttributes set the attribute <attr> to value <value> of this instance of Element in DOM,
      *      or return <attr> value if <value> is not used,
      *      or remove <attr> if <value> is null or undefined
      * @param attr
@@ -657,7 +850,7 @@ this.window && (function (context) {
         }
     }
 
-    var isSimpleSelector = /^[\w-#.\[\]]+$/g;
+    var isSimpleSelector = /^[\w\-_#.\[="' \]]+$/g;
     var getSelectorNodetype = /^[\w-]*/;
     var getSelectorClasses = /\.[\w-]+/g;
     var getSelectorId = /#[\w-]+/;
@@ -712,7 +905,7 @@ this.window && (function (context) {
 
     function createSVGFromSimpleSelector(simpleSelector) {
         var t;
-        var nodeType = ( t = simpleSelector.match(getSelectorNodetype) ) && t[0] || "div";
+        var nodeType = ( t = simpleSelector.match(getSelectorNodetype) ) && t[0] || "g";
         var id = ( t = simpleSelector.match(getSelectorId) ) && t[0].substr(1);
         var _classes = simpleSelector.match(getSelectorClasses), classes = [];
         var attributes = simpleSelector.match(getSelectorAttributes);
@@ -783,7 +976,10 @@ this.window && (function (context) {
             $node.appendChild(children);
         }
         else {
-            if (children instanceof Array || children instanceof NodeList) {
+            if (typeof children === "string") {
+                children = [children];
+            }
+            if (children && children.forEach) {
                 children.forEach(function ($el) {
                     if ($el instanceof Node) {
                         $node.appendChild($el);
@@ -798,11 +994,6 @@ this.window && (function (context) {
                         }
                     }
                 });
-            }
-            else {
-                if (typeof children === "string") {
-                    $node.appendChild(document.createTextNode(children));
-                }
             }
         }
 
@@ -877,7 +1068,7 @@ this.window && (function (context) {
 
 
     /**
-     * @function generateID is used for generating a unique ID for this element, and to sibling it easily.
+     * @method generateID is used for generating a unique ID for this element, and to sibling it easily.
      * @returns {string} the ID.
      */
 
@@ -912,6 +1103,7 @@ this.window && (function (context) {
     context.$.create = create;
     context.$.createSVG = createSVG;
 
+
 })(this.window);
 
 
@@ -921,18 +1113,43 @@ this.window && (function (context) {
 
 this.window && (function (context) {
 
+    var Original = context.Event;
+
     function preventDefault() {
-        this.defaultPrevented = true;
         if (this.detail instanceof context.MutationObserver) {
             this.detail.defaultPrevented = true;
+        }
+        if (this.parent && this.parent.preventDefault) {
+            this.parent.preventDefault();
+        }
+        else {
+            this.defaultPrevented = true;
         }
         return this;
     }
 
     function stopPropagation() {
-        this.propagationStopped = true;
         if (this.detail instanceof context.MutationObserver) {
             this.detail.propagationStopped = true;
+        }
+        if (this.parent && this.parent.stopPropagation) {
+            this.parent.stopPropagation();
+        }
+        else {
+            this.propagationStopped = true;
+        }
+        return this;
+    }
+
+    function stopImmediatePropagation() {
+        if (this.detail instanceof context.MutationObserver) {
+            this.detail.propagationStopped = true;
+        }
+        if (this.parent && this.parent.stopImmediatePropagation) {
+            this.parent.stopImmediatePropagation();
+        }
+        else {
+            this.propagationStopped = true;
         }
         return this;
     }
@@ -956,11 +1173,8 @@ this.window && (function (context) {
         if (!(this instanceof Event))
             return new Event(type, params, target);
 
-        this.defaultPrevented = false;
-        this.propagationStopped = false;
-
         var parent;
-        if (type instanceof context.Event) {
+        if (type instanceof context.Event || type instanceof context.Event.Original) {
             parent = type;
             type = parent.type;
         }
@@ -971,11 +1185,30 @@ this.window && (function (context) {
         defs['currentTarget'] = target;
         defs['timestamp'] = Date.now();
 
-        if (!parent) parent = {};
+        if (!parent) {
+            parent = {};
+            this.defaultPrevented = false;
+            this.propagationStopped = false;
+        }
+        else {
+            var self = this;
+            Object.defineProperty(this, 'defaultPrevented', {
+                "get": function () {
+                    return self.parent.defaultPrevented;
+                }
+            });
+            Object.defineProperty(this, 'propagationStopped', {
+                "get": function () {
+                    return self.parent.propagationStopped;
+                }
+            });
+        }
+
+        var original = parent.originalTarget || parent.srcElement || target || null;
         defs['detail'] = params || parent.detail || null;
-        defs['value'] = parent.originalTarget || target || null;
-        defs['originalTarget'] = parent.originalTarget || target || null;
-        defs['target'] = parent.originalTarget || target || null;
+        defs['value'] = original;
+        defs['originalTarget'] = original;
+        defs['target'] = original;
 
         if (!params) params = {};
         defs['cancelable'] = params.cancelable || parent.cancelable || true;
@@ -993,9 +1226,11 @@ this.window && (function (context) {
 
     Object.extend(Event, {}, {
         'preventDefault': preventDefault,
-        'stopPropagation': stopPropagation
+        'stopPropagation': stopPropagation,
+        'stopImmediatePropagation': stopImmediatePropagation
     });
 
+    Event.Original = Original;
     context.Event = Event;
 
 })(this.window);
@@ -1028,6 +1263,13 @@ this.window && (function (context) {
     }
 
     //  EVENTS
+
+    /**
+     * @method <on> add a function, which is executed at <even> in this object.
+     * @param event {string|Array}
+     * @param fn {function|Array}
+     * @returns {EventTarget}
+     */
 
     function on(event, fn) {
         if (is_string(event)) {
@@ -1064,15 +1306,15 @@ this.window && (function (context) {
         if (is_string(event) && is_function(fn)) {
 
             if (this.addEventListener && !this.__events__[event]) {
-                this.addEventListener(event, function () {
-                    arguments[0] = new Event(arguments[0].type, null, self);
+                this.addEventListener(event, function (ev) {
+                    arguments[0] = new Event(ev, null, self);
                     dispatch.apply(self, arguments)
                 });
             }
 
             if (this.attachEvent && !this.__events__[event]) {
-                this.attachEvent(event, function () {
-                    arguments[0] = new Event(arguments[0].type, null, self);
+                this.attachEvent(event, function (ev) {
+                    arguments[0] = new Event(ev, null, self);
                     dispatch.apply(self, arguments)
                 });
             }
@@ -1086,10 +1328,10 @@ this.window && (function (context) {
     }
 
     /**
-     * @function detach is used to revoke a function ${fn} or every functions if undefined, to call $when ${event} is
+     * @method <detach> is used to revoke a function <fn> or every functions if undefined, to call $when <event> is
      * dispatched.
-     * @param event string|array
-     * @param fn function|array|undefined
+     * @param event {string|Array}
+     * @param fn {function|Array|undefined}
      * @returns {EventTarget}
      */
 
@@ -1143,10 +1385,10 @@ this.window && (function (context) {
     }
 
     /**
-     * @function dispatch is used to call every functions of ${event} asynchronously after a short timeout, with
-     * arguments ${arg}.
-     * @param event Event|string|array
-     * @param args list|array|undefined
+     * @method <dispatch> is used to call every functions of <event> asynchronously after a short timeout, with
+     * arguments <arg>.
+     * @param event {Event|string|Array}
+     * @param args {Array|undefined}
      * @returns {EventTarget}
      */
 
@@ -1188,9 +1430,10 @@ this.window && (function (context) {
             });
         }
 
-
         var self = this;
         if (is_list(this.__events__[event])) {
+
+            this.__events__[event].done = obj;
 
             if (!is_list(args)) {
                 if (args === undefined) args = [];
@@ -1199,18 +1442,24 @@ this.window && (function (context) {
             args.unshift(obj);
 
             this.__events__[event].forEach(function (fn) {
-                setTimeout(function () {
-                    fn.apply(self, args);
-                }, 1);
+                if (is_function(fn)) {
+                    setTimeout(function () {
+                        fn.apply(self, args);
+                    }, 1);
+                }
             });
+        }
+        else {
+            this.__events__[event] = [];
+            this.__events__[event].done = obj;
         }
         return this;
     }
 
     /**
-     * @function dispatchSync is used to call every functions of ${event} synchronously, with arguments ${arg}.
-     * @param event string|array
-     * @param args list|array|undefined
+     * @method <dispatchSync> is used to call every functions of <event> synchronously, with arguments <arg>.
+     * @param event {string|Array}
+     * @param args {Array|undefined}
      * @returns {EventTarget}
      */
 
@@ -1254,6 +1503,8 @@ this.window && (function (context) {
 
         if (is_list(this.__events__[event])) {
 
+            this.__events__[event].done = obj;
+
             if (!is_list(args)) {
                 if (args === undefined) args = [];
                 else args = [args];
@@ -1261,7 +1512,60 @@ this.window && (function (context) {
             args.unshift(obj);
 
             for (var fn in this.__events__[event]) {
-                this.__events__[event][fn].apply(this, args);
+                if (this.__events__[event].hasOwnProperty(fn) && is_function(this.__events__[event][fn])) {
+                    this.__events__[event][fn].apply(this, args);
+                }
+            }
+        }
+        else {
+            this.__events__[event] = [];
+            this.__events__[event].done = obj;
+        }
+
+        return this;
+    }
+
+    /**
+     * @method <once> register the function <fn> for this <event>, then execute it if event already happened
+     * @param event {string|Array}
+     * @param fn {function|Array}
+     * @param args {Object|undefined}
+     * @returns {EventTarget}
+     */
+
+    function once(event, fn, args) {
+        if (is_string(event)) {
+            event = event.toLowerCase();
+            var split = event.split(/[, ]+/g);
+            if (split.length >= 2) {
+                once.call(this, split, fn);
+                return this;
+            }
+        }
+        if (is_list(event)) {
+            for (var ev in event)
+                if (event.hasOwnProperty(ev))
+                    once.call(this, event[ev], fn);
+            return this;
+        }
+
+        on.call(this, event, fn);
+
+        if (this.__events__[event].done && is_function(fn)) {
+            var obj = this.__events__[event].done,
+                self = this;
+
+            if (is_list(this.__events__[event])) {
+
+                if (!is_list(args)) {
+                    if (args === undefined) args = [];
+                    else args = [args];
+                }
+                args.unshift(obj);
+
+                setTimeout(function () {
+                    fn.apply(self, args);
+                }, 1);
             }
         }
 
@@ -1269,9 +1573,52 @@ this.window && (function (context) {
     }
 
     /**
-     * @function count recorded functions of an event ${event} name.
-     * @param event string
-     * @returns null|number
+     * @method <onceSync> register the function <fn> for the <event>, then execute it if event already happened
+     * @param event {Event|Array|string}
+     * @param fn {function|Array}
+     * @param args {Array|undefined}
+     * @returns {onceSync}
+     */
+
+    function onceSync(event, fn, args) {
+        if (is_string(event)) {
+            event = event.toLowerCase();
+            var split = event.split(/[, ]+/g);
+            if (split.length >= 2) {
+                onceSync.call(this, split, fn);
+                return this;
+            }
+        }
+        if (is_list(event)) {
+            for (var ev in event)
+                if (event.hasOwnProperty(ev))
+                    onceSync.call(this, event[ev], fn);
+            return this;
+        }
+
+        on.call(this, event, fn);
+
+        if (this.__events__[event].done && is_function(fn)) {
+            var obj = this.__events__[event].done;
+
+            if (is_list(this.__events__[event])) {
+
+                if (!is_list(args)) {
+                    if (args === undefined) args = [];
+                    else args = [args];
+                }
+                args.unshift(obj);
+                fn.apply(this, args);
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * @method count recorded functions of an event <event> name.
+     * @param event {string}
+     * @returns {null|number} null if <event> never used before
      */
 
     function count(event) {
@@ -1281,12 +1628,20 @@ this.window && (function (context) {
     }
 
 
+    /**
+     * @alias on
+     */
+
     function onAll(eventName, fn) {
         this.forEach(function ($el) {
             $el.on(eventName, fn);
         });
         return this;
     }
+
+    /**
+     * @alias detach
+     */
 
     function detachAll(eventName, fn) {
         this.forEach(function ($el) {
@@ -1295,9 +1650,46 @@ this.window && (function (context) {
         return this;
     }
 
-    function dispatchAll(eventName) {
+    /**
+     * @alias dispatch
+     */
+
+    function dispatchAll(eventName, args) {
         this.forEach(function ($el) {
-            $el.dispatch(eventName);
+            $el.dispatch(eventName, args);
+        });
+        return this;
+    }
+
+    /**
+     * @alias dispatchSync
+     */
+
+    function dispatchAllSync(eventName, args) {
+        this.forEach(function ($el) {
+            $el.dispatchSync(eventName, args);
+        });
+        return this;
+    }
+
+    /**
+     * @alias once
+     */
+
+    function onceAll(eventName, fn, args) {
+        this.forEach(function ($el) {
+            $el.once(eventName, fn, args);
+        });
+        return this;
+    }
+
+    /**
+     * @alias onceSync
+     */
+
+    function onceAllSync(eventName, fn, args) {
+        this.forEach(function ($el) {
+            $el.onceSync(eventName, fn, args);
         });
         return this;
     }
@@ -1322,6 +1714,8 @@ this.window && (function (context) {
             "on": on,
             "dispatch": dispatch,
             "dispatchSync": dispatchSync,
+            "once": once,
+            "onceSync": onceSync,
             "detach": detach,
             "count": count
         });
@@ -1331,17 +1725,32 @@ this.window && (function (context) {
     }
 
     //	EventTargets
-    ([context, Window.prototype, Node.prototype, XMLHttpRequest.prototype]).forEach(function (proto) {
+    ([Window.prototype, Node.prototype, XMLHttpRequest.prototype]).forEach(function (proto) {
         proto.on = on;
         proto.detach = detach;
         proto.dispatch = dispatch;
+        proto.dispatchSync = dispatchSync;
+        proto.once = once;
+        proto.onceSync = onceSync;
     });
+
+    (function (self) {
+        self.on = on.bind(self);
+        self.detach = detach.bind(self);
+        self.dispatch = dispatch.bind(self);
+        self.dispatchSync = dispatchSync.bind(self);
+        self.once = once.bind(self);
+        self.onceSync = onceSync.bind(self);
+    })(context);
 
     //	List of EventTargets
     ([HTMLCollection.prototype, NodeList.prototype]).forEach(function (proto) {
         proto.on = onAll;
         proto.detach = detachAll;
         proto.dispatch = dispatchAll;
+        proto.dispatchSync = dispatchAllSync;
+        proto.once = onceAll;
+        proto.onceSync = onceAllSync;
     });
 
     context.EventTarget = _declare();
@@ -1424,7 +1833,6 @@ this.window && (function (context) {
         var mo = new MutationObserver(function (mutations) {
             mutations.forEach(function (mutation) {
                 mutation.propagationStopped = false;
-                var ev = new Event("domchange", mutation, mutation.target);
 
                 if (mutation.addedNodes.length) {
                     for (var a in mutation.addedNodes) {
@@ -1928,11 +2336,13 @@ this.window && (function (context) {
 
     function ajax(method, file, data, success, fail, headers, overrideMime) {
 
-        method = try_exec(method);
-        file = try_exec(file);
-        data = try_exec(data);
-        headers = try_exec(headers);
-        overrideMime = try_exec(overrideMime);
+        var x = new XMLHttpRequest();
+
+        method = try_exec(method, x);
+        file = try_exec(file, x);
+        data = try_exec(data, x);
+        headers = try_exec(headers, x);
+        overrideMime = try_exec(overrideMime, x);
 
         method = is_string(method) ? method : "GET";
         file = is_string(file) ? file : ".";
@@ -1940,7 +2350,6 @@ this.window && (function (context) {
         fail = is_function(fail) ? fail : empty;
         overrideMime = is_string(overrideMime) ? overrideMime : null;
 
-        var x = new XMLHttpRequest();
         ( x.on || x.addEventListener || x.attachEvent ).call(x, 'loadend', success);
         ( x.on || x.addEventListener || x.attachEvent ).call(x, 'error', fail);
         x.open(method, file, true);
@@ -1966,7 +2375,7 @@ this.window && (function (context) {
         x.then = function (fn) {
             if (is_function(fn)) {
                 if (endEvent && endEvent.type === 'loadend') {
-                    fn(endEvent);
+                    fn.call(x, endEvent);
                 }
                 else {
                     x.on('loadend', fn);
@@ -1978,7 +2387,7 @@ this.window && (function (context) {
         x.catch = function (fn) {
             if (is_function(fn)) {
                 if (endEvent && endEvent.type === 'error') {
-                    fn(endEvent);
+                    fn.call(x, endEvent);
                 }
                 else {
                     x.on('error', fn);
@@ -1990,9 +2399,9 @@ this.window && (function (context) {
         return x;
     }
 
-    function try_exec(el) {
+    function try_exec(el, xhr) {
         if (is_function(el)) {
-            return el();
+            return el(xhr);
         }
         return el;
     }
@@ -2004,8 +2413,8 @@ this.window && (function (context) {
             headers = method.headers;
             fail = method.fail || method.failure || method.error;
             success = method.success || method.load;
-            data = method.data || method.post || method.args || method.arguments;
-            file = method.file || method.path || method.source;
+            data = method.data || method.post || method.args || method.arguments || method.body;
+            file = method.file || method.path || method.source || method.url;
             method = method.method;
 
             return param_filter(method, file, data, success, fail, headers, overrideMime);
@@ -2029,12 +2438,12 @@ this.window && (function (context) {
     //  PUBLIC
 
     /**
-     * @function Resource
+     * @class Resource
      * @param method string|function|{Object} where object can be written like this :
      *      {
      *          method: string|{Function},
-     *          file=path=source: string|{Function},
-     *          data=post=args=arguments: *|{Function},
+     *          file=path=source=url: string|{Function},
+     *          data=post=args=arguments=body: *|{Function},
      *          success=load: {Function},
      *          fail=failure=error: {Function},
      *          header: {}|{Function},
@@ -2060,13 +2469,13 @@ this.window && (function (context) {
 
 
     /**
-     * @function addMethod
+     * @method addMethod
      * @param name string is used for register a function to this resource
      * @param method string|function|{Object} where object can be written like this :
      *      {
      *          method: string|{Function},
-     *          file=path=source: string|{Function},
-     *          data=post=args=arguments: *|{Function},
+     *          file=path=source=url: string|{Function},
+     *          data=post=args=arguments=body: *|{Function},
      *          success=load: {Function},
      *          fail=failure=error: {Function},
      *          header: {}|{Function},
@@ -2099,5 +2508,104 @@ this.window && (function (context) {
     });
 
     context.Resource = Resource;
+
+})(this.window);
+
+
+this.window && (function (context) {
+
+    //  static
+    function is_function(el) {
+        return (typeof el === 'function');
+    }
+
+    function is_string(el) {
+        return (typeof el === 'string');
+    }
+
+    function HTMLCustomElement() {
+    }
+
+    HTMLCustomElement.prototype = Object.create(document.createElement("div"));
+
+    function define(nodeName, constructor, prototype) {
+        if (is_string(nodeName) && nodeName.match(/^[\w\-_]+$/i) && is_function(constructor)) {
+            if (context.customElements && Function.isClass(constructor)) {
+                context.customElements.define(nodeName, constructor);
+            }
+            else if (prototype) {
+                Object.extend(constructor, HTMLCustomElement, prototype);
+            }
+            var old = nodeNames[nodeName] || null;
+            nodeNames[nodeName] = constructor;
+            return old;
+        }
+    }
+
+    function construct(node) {
+        var constructor;
+        if (is_function(constructor = nodeNames[node.nodeName.toLowerCase()])) {
+            if (listened.indexOf(node) === -1) {
+                listened.push(node);
+
+                if (!(context.customElements && Function.isClass(constructor))) {
+                    Object.getOwnPropertyNames(constructor.prototype).forEach(function (key) {
+                        Object.defineProperty(node, key, Object.getOwnPropertyDescriptor(constructor.prototype, key));
+                    });
+                    constructor.apply(node);
+                }
+
+                var children_ended = [];
+
+                var ended = function () {
+                    for (var i in node.children) {
+                        if (node.children.hasOwnProperty(i)
+                            && children_ended.indexOf(node.children[i]) === -1
+                            && nodeNames.indexOf(node.children[i].nodeName.toLowerCase()) !== -1) {
+                            return false;
+                        }
+                    }
+                    return true;
+                };
+
+                var end = function (ev) {
+                    children_ended.push(ev.target);
+                    if (ended()) {
+                        node.dispatch('load,define');
+                    }
+                    ev.target.detach('load', end);
+                };
+
+                var count = 0;
+                for (var i in node.children) {
+                    if (node.children.hasOwnProperty(i) && nodeNames.indexOf(node.children[i].nodeName.toLowerCase()) !== -1) {
+                        node.children[i].on('load', end);
+                        count++;
+                    }
+                }
+                if (!count) {
+                    node.dispatch('load,define');
+                }
+            }
+        }
+    }
+
+    var listened = window.listened = [];
+    var nodeNames = window.nodeNames = [];
+
+    $.change(function (ev) {
+        function add(node) {
+            node.children.forEach(add);
+            construct(node);
+        }
+
+        ev.detail.addedNodes.forEach(add);
+    });
+
+    $.define = define;
+    $.define.definitions = nodeNames;
+    $.define.defined = listened;
+
+    context.HTMLCustomElement = HTMLCustomElement;
 
 })(this.window);
